@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from thefuzz import process, fuzz
 
 st.set_page_config(page_title="Retail Arbitrage Dashboard", layout="wide")
 
@@ -109,19 +110,91 @@ else:
 
             supplier_df = supplier_df.dropna(subset=["US_Price_USD"])
             local_df = local_df.dropna(subset=["Local_Price_GHS"])
-
-            # Full merge for match diagnostics
-            diagnostic_merge = pd.merge(
+            
+            # --- Fuzzy Matching Logic ---
+            # 1. First, get exact matches
+            exact_merge = pd.merge(
                 supplier_df,
                 local_df,
                 on=["Model", "Storage", "Condition"],
-                how="outer",
-                indicator=True
+                how="inner"
             )
+            
+            # 2. Identify unmatched rows
+            exact_keys_supplier = exact_merge[["Model", "Storage", "Condition"]].drop_duplicates()
+            unmatched_supplier = pd.merge(supplier_df, exact_keys_supplier, indicator=True, how='left').query('_merge=="left_only"').drop('_merge', axis=1)
+            
+            exact_keys_local = exact_merge[["Model", "Storage", "Condition"]].drop_duplicates()
+            unmatched_local = pd.merge(local_df, exact_keys_local, indicator=True, how='left').query('_merge=="left_only"').drop('_merge', axis=1)
 
-            matched_df = diagnostic_merge[diagnostic_merge["_merge"] == "both"].copy()
-            supplier_only_df = diagnostic_merge[diagnostic_merge["_merge"] == "left_only"].copy()
-            local_only_df = diagnostic_merge[diagnostic_merge["_merge"] == "right_only"].copy()
+            fuzzy_matches = []
+            
+            # 3. Apply fuzzy matching ONLY to unmatched rows where Storage and Condition match exactly
+            if not unmatched_supplier.empty and not unmatched_local.empty:
+               local_models = unmatched_local["Model"].unique().tolist()
+               
+               for idx, s_row in unmatched_supplier.iterrows():
+                   s_model = s_row["Model"]
+                   s_storage = s_row["Storage"]
+                   s_condition = s_row["Condition"]
+                   
+                   # Filter local candidates that have the exact same storage and condition
+                   candidates = unmatched_local[
+                       (unmatched_local["Storage"] == s_storage) & 
+                       (unmatched_local["Condition"] == s_condition)
+                   ]["Model"].tolist()
+                   
+                   if candidates:
+                       # Find best match using token_sort_ratio to handle word order changes
+                       best_match, score = process.extractOne(s_model, candidates, scorer=fuzz.token_sort_ratio)
+                       
+                       # Set a threshold (e.g., 85)
+                       if score >= 85:
+                           # Find the corresponding local row
+                           l_row = unmatched_local[
+                               (unmatched_local["Model"] == best_match) & 
+                               (unmatched_local["Storage"] == s_storage) & 
+                               (unmatched_local["Condition"] == s_condition)
+                           ].iloc[0]
+                           
+                           # Combine data
+                           combined_row = s_row.to_dict()
+                           combined_row["Local_Price_GHS"] = l_row["Local_Price_GHS"]
+                           combined_row["Matched_Local_Model"] = best_match # Keep track for diagnostics
+                           combined_row["Fuzzy_Score"] = score
+                           fuzzy_matches.append(combined_row)
+            
+            fuzzy_df = pd.DataFrame(fuzzy_matches)
+            
+            # Combine exact matches and fuzzy matches
+            if not fuzzy_df.empty:
+                # Add columns to exact_merge to match fuzzy_df schema
+                exact_merge["Matched_Local_Model"] = exact_merge["Model"]
+                exact_merge["Fuzzy_Score"] = 100
+                matched_df = pd.concat([exact_merge, fuzzy_df], ignore_index=True)
+            else:
+                matched_df = exact_merge.copy()
+
+            # --- Full Diagnostics Merge (To find what's truly left over) ---
+            # To figure out true supplier_only and local_only, we need to look at what's in matched_df
+            
+            if not matched_df.empty:
+                # Remove matched items from supplier
+                matched_s_keys = matched_df[["Model", "Storage", "Condition"]].drop_duplicates()
+                supplier_only_df = pd.merge(supplier_df, matched_s_keys, indicator=True, how='left').query('_merge=="left_only"').drop('_merge', axis=1)
+                
+                # Remove matched items from local (remember local models might have been fuzzy matched)
+                # For local, the join keys in matched_df are Matched_Local_Model, Storage, Condition (or Model if exact)
+                local_match_keys = matched_df.copy()
+                if "Matched_Local_Model" in local_match_keys.columns:
+                     local_match_keys["Model"] = local_match_keys["Matched_Local_Model"]
+                local_match_keys = local_match_keys[["Model", "Storage", "Condition"]].drop_duplicates()
+                
+                local_only_df = pd.merge(local_df, local_match_keys, indicator=True, how='left').query('_merge=="left_only"').drop('_merge', axis=1)
+            else:
+                supplier_only_df = supplier_df.copy()
+                local_only_df = local_df.copy()
+
 
             if matched_df.empty:
                 st.warning(
@@ -139,6 +212,14 @@ else:
                     matched_df["Local_Price_GHS"] - matched_df["Landed_Cost_GHS"]
                 )
 
+                matched_df["ROI_%"] = (
+                    matched_df["Net_Profit_GHS"] / matched_df["Landed_Cost_GHS"]
+                ) * 100
+
+                matched_df["Margin_%"] = (
+                    matched_df["Net_Profit_GHS"] / matched_df["Local_Price_GHS"]
+                ) * 100
+
                 matched_df = matched_df.sort_values(
                     by="Net_Profit_GHS",
                     ascending=False
@@ -146,23 +227,43 @@ else:
 
                 # Summary metrics
                 total_items = len(matched_df)
-                avg_profit = matched_df["Net_Profit_GHS"].mean()
                 best_profit = matched_df["Net_Profit_GHS"].max()
+                avg_profit = matched_df["Net_Profit_GHS"].mean()
+                best_roi = matched_df["ROI_%"].max()
+                avg_roi = matched_df["ROI_%"].mean()
+                avg_margin = matched_df["Margin_%"].mean()
 
-                metric1, metric2, metric3 = st.columns(3)
-                metric1.metric("Matched Devices", total_items)
-                metric2.metric("Average Net Profit (GHS)", f"{avg_profit:,.2f}")
-                metric3.metric("Best Net Profit (GHS)", f"{best_profit:,.2f}")
+                col_a, col_b, col_c = st.columns(3)
+                col_a.metric("Matched Devices", total_items)
+                col_b.metric("Best Net Profit (GHS)", f"{best_profit:,.2f}")
+                col_c.metric("Avg Net Profit (GHS)", f"{avg_profit:,.2f}")
 
-                st.write("### Profit Analysis")
+                col_d, col_e, col_f = st.columns(3)
+                col_d.metric("Best ROI", f"{best_roi:,.2f}%")
+                col_e.metric("Avg ROI", f"{avg_roi:,.2f}%")
+                col_f.metric("Avg Margin", f"{avg_margin:,.2f}%")
 
-                display_df = matched_df.copy()
-                display_df["US_Price_USD"] = display_df["US_Price_USD"].map(lambda x: f"{x:,.2f}")
-                display_df["Local_Price_GHS"] = display_df["Local_Price_GHS"].map(lambda x: f"{x:,.2f}")
-                display_df["Landed_Cost_GHS"] = display_df["Landed_Cost_GHS"].map(lambda x: f"{x:,.2f}")
-                display_df["Net_Profit_GHS"] = display_df["Net_Profit_GHS"].map(lambda x: f"{x:,.2f}")
+                st.write("### Profit Analysis Table")
+                st.caption("Sorted by highest Net Profit. Green = higher profit. Blue = higher ROI.")
 
-                st.dataframe(display_df.drop(columns=["_merge"]), use_container_width=True)
+                styled_df = matched_df.copy()
+                if "Matched_Local_Model" in styled_df.columns:
+                    styled_df.drop(columns=["Matched_Local_Model", "Fuzzy_Score"], inplace=True, errors="ignore")
+                if "_merge" in styled_df.columns:
+                    styled_df.drop(columns=["_merge"], inplace=True, errors="ignore")
+
+                st.dataframe(
+                    styled_df.style.format({
+                        "US_Price_USD": "${:,.2f}",
+                        "Local_Price_GHS": "GH\u20b5{:,.2f}",
+                        "Landed_Cost_GHS": "GH\u20b5{:,.2f}",
+                        "Net_Profit_GHS": "GH\u20b5{:,.2f}",
+                        "ROI_%": "{:,.2f}%",
+                        "Margin_%": "{:,.2f}%",
+                    }).background_gradient(subset=["Net_Profit_GHS"], cmap="Greens")
+                     .background_gradient(subset=["ROI_%"], cmap="Blues"),
+                    use_container_width=True
+                )
 
                 st.write("### Top 10 Most Profitable Devices")
 
@@ -173,11 +274,19 @@ else:
                     chart_df["Condition"].astype(str)
                 )
 
-                top_10 = chart_df.head(10).set_index("Device_Label")[["Net_Profit_GHS"]]
-                st.bar_chart(top_10)
+                top10_profit = chart_df.head(10).set_index("Device_Label")[["Net_Profit_GHS"]]
+                top10_roi = chart_df.sort_values(by="ROI_%", ascending=False).head(10).set_index("Device_Label")[["ROI_%"]]
+
+                chart_col1, chart_col2 = st.columns(2)
+                with chart_col1:
+                    st.write("**By Absolute Profit (GHS)**")
+                    st.bar_chart(top10_profit)
+                with chart_col2:
+                    st.write("**By ROI (%)**")
+                    st.bar_chart(top10_roi)
 
                 # Download matched results
-                csv_data = matched_df.drop(columns=["_merge"]).to_csv(index=False).encode("utf-8")
+                csv_data = matched_df.drop(columns=["_merge"], errors="ignore").to_csv(index=False).encode("utf-8")
                 st.download_button(
                     label="Download Profit Analysis CSV",
                     data=csv_data,
