@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from thefuzz import process, fuzz
+from rapidfuzz import process, fuzz
 
 st.set_page_config(page_title="Retail Arbitrage Dashboard", layout="wide")
 
