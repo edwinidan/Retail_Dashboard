@@ -225,13 +225,67 @@ else:
                     ascending=False
                 ).reset_index(drop=True)
 
+                # --- ADVANCED FILTERING PANEL ---
+                st.sidebar.divider()
+                st.sidebar.header("🔍 Advanced Filters")
+                
+                # Model Family Filter
+                all_models = ["All"] + sorted(matched_df["Model"].unique().tolist())
+                selected_models = st.sidebar.multiselect(
+                    "Filter by Phone Model",
+                    options=all_models,
+                    default=["All"]
+                )
+                
+                # Storage Filter
+                all_storage = ["All"] + sorted(matched_df["Storage"].astype(str).unique().tolist())
+                selected_storage = st.sidebar.multiselect(
+                    "Filter by Storage Capacity",
+                    options=all_storage,
+                    default=["All"]
+                )
+                
+                # ROI Slider
+                min_roi = float(matched_df["ROI_%"].min())
+                max_roi = float(matched_df["ROI_%"].max())
+                
+                # Only show slider if there's a valid range
+                if min_roi < max_roi:
+                    selected_min_roi = st.sidebar.slider(
+                        "Minimum ROI (%)",
+                        min_value=min_roi,
+                        max_value=max_roi,
+                        value=0.0 if min_roi < 0 else min_roi,
+                        step=5.0
+                    )
+                else:
+                    selected_min_roi = min_roi
+                
+                # Apply Filters
+                filtered_df = matched_df.copy()
+                
+                if "All" not in selected_models and selected_models:
+                    filtered_df = filtered_df[filtered_df["Model"].isin(selected_models)]
+                    
+                if "All" not in selected_storage and selected_storage:
+                    filtered_df = filtered_df[filtered_df["Storage"].astype(str).isin(selected_storage)]
+                    
+                filtered_df = filtered_df[filtered_df["ROI_%"] >= selected_min_roi]
+                
+                # If everything gets filtered out, warn the user
+                if filtered_df.empty:
+                    st.warning("Your filters removed all devices. Please adjust them to see results.")
+                    st.stop()
+                    
+                # From here down, we use filtered_df instead of matched_df
+                
                 # At-A-Glance KPI Dashboard metrics
-                profitable_items = matched_df[matched_df["Net_Profit_GHS"] > 0]
+                profitable_items = filtered_df[filtered_df["Net_Profit_GHS"] > 0]
                 total_potential_profit = profitable_items["Net_Profit_GHS"].sum()
                 total_initial_capital = profitable_items["Landed_Cost_GHS"].sum()
                 
-                best_profit = matched_df["Net_Profit_GHS"].max()
-                avg_roi = matched_df["ROI_%"].mean()
+                best_profit = filtered_df["Net_Profit_GHS"].max()
+                avg_roi = filtered_df["ROI_%"].mean()
 
                 st.write("### 🚀 At-A-Glance KPI Dashboard")
                 kpi1, kpi2, kpi3, kpi4 = st.columns(4)
@@ -260,10 +314,10 @@ else:
                 st.divider()
 
                 # Original Summary metrics
-                total_items = len(matched_df)
-                avg_profit = matched_df["Net_Profit_GHS"].mean()
-                best_roi = matched_df["ROI_%"].max()
-                avg_margin = matched_df["Margin_%"].mean()
+                total_items = len(filtered_df)
+                avg_profit = filtered_df["Net_Profit_GHS"].mean()
+                best_roi = filtered_df["ROI_%"].max()
+                avg_margin = filtered_df["Margin_%"].mean()
 
                 st.write("### Detailed Overview")
                 col_a, col_b, col_c = st.columns(3)
@@ -281,7 +335,7 @@ else:
                 st.write("### Profit Analysis Table")
                 st.caption("Sorted by highest Net Profit. Green = higher profit. Blue = higher ROI.")
 
-                styled_df = matched_df.copy()
+                styled_df = filtered_df.copy()
                 if "Matched_Local_Model" in styled_df.columns:
                     styled_df.drop(columns=["Matched_Local_Model", "Fuzzy_Score"], inplace=True, errors="ignore")
                 if "_merge" in styled_df.columns:
@@ -335,7 +389,7 @@ else:
 
                 st.write("### Top 10 Most Profitable Devices")
 
-                chart_df = matched_df.copy()
+                chart_df = filtered_df.copy()
                 chart_df["Device_Label"] = (
                     chart_df["Model"] + " | " +
                     chart_df["Storage"].astype(str) + " | " +
@@ -533,7 +587,7 @@ else:
                 st.divider()
 
                 # Download matched results
-                csv_data = matched_df.drop(columns=["_merge"], errors="ignore").to_csv(index=False).encode("utf-8")
+                csv_data = filtered_df.drop(columns=["_merge"], errors="ignore").to_csv(index=False).encode("utf-8")
                 st.download_button(
                     label="Download Profit Analysis CSV",
                     data=csv_data,
