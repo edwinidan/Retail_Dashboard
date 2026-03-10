@@ -438,6 +438,48 @@ else:
 
                 st.divider()
 
+                st.divider()
+
+                st.write("### 🍩 Overall Market Health (ROI Distribution)")
+                st.caption(
+                    "This chart breaks down all available opportunities by Return on Investment (ROI). "
+                    "A healthy market has a large slice of 30%+ ROI items."
+                )
+
+                # Create ROI buckets
+                bins = [-float('inf'), 0, 10, 30, 50, float('inf')]
+                labels = ['Unprofitable (<0%)', 'Low Profit (0-10%)', 'Solid Profit (10-30%)', 'Great Profit (30-50%)', 'Incredible Profit (50%+)']
+                
+                # Copy df to avoid setting with copy warnings
+                donut_df = chart_df.copy()
+                donut_df['ROI_Bucket'] = pd.cut(donut_df['ROI_%'], bins=bins, labels=labels)
+                
+                # Count the number of items in each bucket
+                roi_counts = donut_df['ROI_Bucket'].value_counts().reset_index()
+                roi_counts.columns = ['ROI Tier', 'Number of Devices']
+                
+                # Create the Donut Chart
+                fig_donut = px.pie(
+                    roi_counts, 
+                    values='Number of Devices', 
+                    names='ROI Tier', 
+                    hole=0.4,
+                    color='ROI Tier',
+                    color_discrete_map={
+                        'Unprofitable (<0%)': '#EF553B',       # Red
+                        'Low Profit (0-10%)': '#FFA15A',       # Orange
+                        'Solid Profit (10-30%)': '#00CC96',    # Light Green
+                        'Great Profit (30-50%)': '#00A08B',    # Teal
+                        'Incredible Profit (50%+)': '#19D3F3'  # Bright Blue
+                    }
+                )
+                
+                fig_donut.update_traces(textposition='inside', textinfo='percent+label')
+                
+                st.plotly_chart(fig_donut, use_container_width=True)
+
+                st.divider()
+
                 # Download matched results
                 csv_data = matched_df.drop(columns=["_merge"], errors="ignore").to_csv(index=False).encode("utf-8")
                 st.download_button(
