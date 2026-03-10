@@ -300,6 +300,39 @@ else:
                     use_container_width=True
                 )
 
+                st.divider()
+
+                st.write("### Simplified Profit Analysis Table")
+                st.caption("A cleaner view focusing only on the most important metrics.")
+
+                cols_to_drop = [
+                    "Match Status", 
+                    "Requested SIM Status", 
+                    "Requested SIM Type", 
+                    "Back Market SIM Type", 
+                    "Notes", 
+                    "Condition",
+                    "SIM Status",
+                    "SIM Type",
+                    "Price (USD)"
+                ]
+                
+                simplified_df = styled_df.copy()
+                simplified_df.drop(columns=cols_to_drop, inplace=True, errors="ignore")
+                
+                st.dataframe(
+                    simplified_df.style.format({
+                        "US_Price_USD": "${:,.2f}",
+                        "Local_Price_GHS": "GH\u20b5{:,.2f}",
+                        "Landed_Cost_GHS": "GH\u20b5{:,.2f}",
+                        "Net_Profit_GHS": "GH\u20b5{:,.2f}",
+                        "ROI_%": "{:,.2f}%",
+                        "Margin_%": "{:,.2f}%",
+                    }).background_gradient(subset=["Net_Profit_GHS"], cmap="Greens")
+                     .background_gradient(subset=["ROI_%"], cmap="Blues"),
+                    use_container_width=True
+                )
+
                 st.write("### Top 10 Most Profitable Devices")
 
                 chart_df = matched_df.copy()
