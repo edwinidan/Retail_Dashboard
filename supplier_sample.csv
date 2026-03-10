@@ -1,16 +1,37 @@
-Model,Storage,Condition,US_Price_USD
-iPhone 11,64GB,Fair,180
-iPhone 11 Pro Max,128GB,Good,350
-iPhone 11 Pro Max,256GB,Premium,420
-iPhone 12,128GB,Premium,330
-iPhone 12,256GB,Good,340
-iPhone 12 Pro,128GB,Good,380
-iPhone 12 Pro,256GB,Premium,470
-iPhone 12 Pro Max,128GB,Fair,370
-iPhone 12 Pro Max,256GB,Good,430
-iPhone 13 Pro,128GB,Good,450
-iPhone 13 Pro Max,128GB,Fair,460
-iPhone 14,128GB,Fair,470
-iPhone 14 Pro,128GB,Good,620
-iPhone 14 Pro,256GB,Premium,710
-iPhone 14 Pro Max,128GB,Fair,610
+Model,Storage,Requested SIM Status,Requested SIM Type,Price (USD),Match Status,Back Market SIM Type,Notes,Condition,US_Price_USD
+iPhone 7,32GB,Unlocked,Physical SIM,55.0,Matched on Back Market,Physical SIM,Back Market exact 32GB unlocked listing found.,,55.0
+iPhone Se2,64GB,Unlocked,Physical SIM,95.0,Matched on Back Market,Physical SIM + eSIM,Back Market labels this as iPhone SE (2020); lowest visible 64GB unlocked price was for Black.,,95.0
+iPhone Xr,64GB,Unlocked,Physical SIM,129.0,Matched on Back Market,Physical SIM + eSIM,Matched as iPhone XR unlocked 64GB.,,129.0
+iPhone Xr,128GB,Unlocked,Physical SIM,150.11,Matched on Back Market,Physical SIM + eSIM,Matched as iPhone XR unlocked 128GB; exact visible price on coral listing.,,150.11
+iPhone 11,64GB,Unlocked,Physical SIM,149.0,Matched on Back Market,Physical SIM + eSIM,Matched as iPhone 11 unlocked 64GB Black.,,149.0
+iPhone 11,128GB,Unlocked,Physical SIM,169.0,Matched on Back Market,Physical SIM + eSIM,Matched as iPhone 11 unlocked 128GB.,,169.0
+iPhone 11 Pro,64GB,Unlocked,Physical SIM,207.0,Matched on Back Market,Physical SIM + eSIM,Matched as iPhone 11 Pro unlocked 64GB Gold.,,207.0
+iPhone 11 Pro,256GB,Unlocked,Physical SIM,215.0,Matched on Back Market,Physical SIM + eSIM,Matched as iPhone 11 Pro unlocked 256GB Silver.,,215.0
+iPhone 12 Mini,64GB,Unlocked,Physical SIM,150.0,Matched on Back Market,Physical SIM + eSIM,Matched as iPhone 12 mini unlocked 64GB Black.,,150.0
+iPhone 12 Mini,128GB,Unlocked,Physical SIM,188.0,Matched on Back Market,Physical SIM + eSIM,Matched using 128GB price shown on 64GB variant page.,,188.0
+iPhone 12,64GB,Unlocked,Physical SIM,197.0,Matched on Back Market,Physical SIM + eSIM,Matched as iPhone 12 unlocked 64GB Green.,,197.0
+iPhone 12,128GB,Unlocked,Physical SIM,270.0,Matched on Back Market,Physical SIM + eSIM,Matched using 128GB price shown on 64GB variant page.,,270.0
+iPhone 12 Pro,128GB,Unlocked,Physical SIM,245.0,Matched on Back Market,Physical SIM + eSIM,Matched as iPhone 12 Pro unlocked 128GB Graphite.,,245.0
+iPhone 12 Pro Max,128GB,Unlocked,Physical SIM,340.0,Matched on Back Market,Physical SIM + eSIM,Matched as iPhone 12 Pro Max unlocked 128GB Silver.,,340.0
+iPhone 13,128GB,Locked,Physical SIM,193.0,Partial match on Back Market,Physical SIM + eSIM,"Locked listing found, but Back Market example was AT&T-locked rather than generic locked.",,193.0
+iPhone 13,128GB,Unlocked,Physical SIM,225.0,Matched on Back Market,Physical SIM + eSIM,Matched as iPhone 13 unlocked 128GB.,,225.0
+iPhone 13 Pro,128GB,Unlocked,Physical SIM,319.0,Matched on Back Market,Physical SIM + eSIM,Matched as iPhone 13 Pro unlocked 128GB.,,319.0
+iPhone 13 Pro Max,128GB,Unlocked,Physical SIM,350.0,Matched on Back Market,Physical SIM + eSIM,Matched as iPhone 13 Pro Max unlocked 128GB.,,350.0
+iPhone 14 Plus,128GB,Locked,eSIM,318.0,Partial match on Back Market,eSIM,"Locked listing found, but Back Market example was AT&T-locked.",,318.0
+iPhone 14 Pro,128GB,Unlocked,Physical SIM,360.0,Partial match on Back Market,eSIM,"Storage/price matched, but US Back Market listing is eSIM, not physical SIM.",,360.0
+iPhone 14 Pro Max,128GB,Unlocked,Physical SIM,424.99,Partial match on Back Market,eSIM,"Storage/price matched, but US Back Market listing is eSIM, not physical SIM.",,424.99
+iPhone 14 Pro Max,256GB,Locked,eSIM,450.0,Partial match on Back Market,eSIM,"Locked listing found, but Back Market example was AT&T-locked.",,450.0
+iPhone 15 Pro Max,256GB,Unlocked,eSIM,566.0,Matched on Back Market,eSIM,Matched at model-page storage price; some color pages showed higher prices.,,566.0
+iPhone 16,128GB,Locked,eSIM,525.0,Partial match on Back Market,eSIM,"Locked listing found, but Back Market example was Verizon-locked; AT&T listings also appeared at higher prices.",,525.0
+iPhone 16,128GB,Unlocked,eSIM,556.0,Matched on Back Market,eSIM,Matched as iPhone 16 unlocked 128GB eSIM.,,556.0
+iPhone 16,128GB,Unlocked,Physical SIM,560.0,Partial match on Back Market,Dual Physical SIM,Back Market had a dual-physical-SIM iPhone 16 variant; price taken from a separate unlocked 128GB listing.,,560.0
+iPhone 16 Plus,128GB,Unlocked,Physical SIM,558.0,Partial match on Back Market,Dual Physical SIM sold out / eSIM available,Back Market page shows dual physical SIM sold out; available unlocked listing price was for eSIM.,,558.0
+iPhone 16 Pro,128GB,Unlocked,eSIM,645.0,Matched on Back Market,eSIM,Matched as iPhone 16 Pro unlocked 128GB eSIM.,,645.0
+iPhone 16 Pro,256GB,Unlocked,eSIM,680.0,Matched on Back Market,eSIM,Matched as iPhone 16 Pro unlocked 256GB eSIM.,,680.0
+iPhone 16 Pro Max,256GB,Unlocked,eSIM,775.83,Matched on Back Market,eSIM,Matched as iPhone 16 Pro Max unlocked 256GB eSIM.,,775.83
+iPhone 16 Pro Max,256GB,Unlocked,Physical SIM,775.83,Partial match on Back Market,Dual Physical SIM,"Back Market also has a dual-physical-SIM 16 Pro Max variant, but the visible price captured was from the eSIM listing.",,775.83
+iPhone 16 Pro Max,1TB,Unlocked,eSIM,1155.0,Matched on Back Market,eSIM,Matched at model-page 1000GB storage price.,,1155.0
+iPhone 17 Air,256GB,Unlocked,eSIM,802.0,Matched on Back Market,eSIM,Back Market uses the name 'iPhone Air' rather than 'iPhone 17 Air' on product pages.,,802.0
+iPhone 17 Air,256GB,Unlocked,Physical SIM,,No direct Back Market match found,,Back Market iPhone Air pages found were eSIM; no physical-SIM listing confirmed in search results.,,
+iPhone 17 Pro Max,256GB,Locked,Physical SIM,975.0,Partial match on Back Market,eSIM,"Locked listing found, but Back Market US page says eSIM only, not physical SIM.",,975.0
+iPhone 17 Pro Max,256GB,Unlocked,Physical SIM,1130.0,Partial match on Back Market,eSIM,"Unlocked listing found, but Back Market US page says eSIM only, not physical SIM.",,1130.0

@@ -225,14 +225,47 @@ else:
                     ascending=False
                 ).reset_index(drop=True)
 
-                # Summary metrics
-                total_items = len(matched_df)
+                # At-A-Glance KPI Dashboard metrics
+                profitable_items = matched_df[matched_df["Net_Profit_GHS"] > 0]
+                total_potential_profit = profitable_items["Net_Profit_GHS"].sum()
+                total_initial_capital = profitable_items["Landed_Cost_GHS"].sum()
+                
                 best_profit = matched_df["Net_Profit_GHS"].max()
+                avg_roi = matched_df["ROI_%"].mean()
+
+                st.write("### 🚀 At-A-Glance KPI Dashboard")
+                kpi1, kpi2, kpi3, kpi4 = st.columns(4)
+                
+                kpi1.metric(
+                    "Total Potential Profit", 
+                    f"GH\u20b5{total_potential_profit:,.2f}", 
+                    help="Total profit if you bought one of every profitable item."
+                )
+                kpi2.metric(
+                    "Initial Capital Required", 
+                    f"GH\u20b5{total_initial_capital:,.2f}",
+                    help="Total cost (incl. shipping & fees) to buy all profitable inventory."
+                )
+                kpi3.metric(
+                    "Highest Single Item Profit", 
+                    f"GH\u20b5{best_profit:,.2f}",
+                    help="The absolute max profit from a single matched item."
+                )
+                kpi4.metric(
+                    "Average ROI", 
+                    f"{avg_roi:,.2f}%",
+                    help="The average return on investment across all items."
+                )
+                
+                st.divider()
+
+                # Original Summary metrics
+                total_items = len(matched_df)
                 avg_profit = matched_df["Net_Profit_GHS"].mean()
                 best_roi = matched_df["ROI_%"].max()
-                avg_roi = matched_df["ROI_%"].mean()
                 avg_margin = matched_df["Margin_%"].mean()
 
+                st.write("### Detailed Overview")
                 col_a, col_b, col_c = st.columns(3)
                 col_a.metric("Matched Devices", total_items)
                 col_b.metric("Best Net Profit (GHS)", f"{best_profit:,.2f}")
@@ -242,6 +275,8 @@ else:
                 col_d.metric("Best ROI", f"{best_roi:,.2f}%")
                 col_e.metric("Avg ROI", f"{avg_roi:,.2f}%")
                 col_f.metric("Avg Margin", f"{avg_margin:,.2f}%")
+
+                st.divider()
 
                 st.write("### Profit Analysis Table")
                 st.caption("Sorted by highest Net Profit. Green = higher profit. Blue = higher ROI.")

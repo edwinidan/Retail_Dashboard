@@ -1,16 +1,37 @@
-Model,Storage,Condition,Local_Price_GHS
-iPhone 11,64GB,Fair,3100
-iPhone 11 Pro Max,128GB,Good,5800
-iPhone 11 Pro Max,256GB,Premium,6900
-iPhone 12,256GB,Good,5600
-iPhone 12,128GB,Premium,5500
-iPhone 12 Pro,128GB,Good,6500
-iPhone 12 Pro,256GB,Premium,7600
-iPhone 12 Pro Max,128GB,Fair,6700
-iPhone 12 Pro Max,256GB,Good,7600
-iPhone 13 Pro,128GB,Good,7900
-iPhone 13 Pro Max,128GB,Fair,8100
-iPhone 14,128GB,Fair,7900
-iPhone 14 Pro,128GB,Good,9700
-iPhone 14 Pro,256GB,Premium,10800
-iPhone 14 Pro Max,128GB,Fair,9900
+Model,Storage,SIM Status,SIM Type,Price (GH₵),Condition,Local_Price_GHS
+iPhone 7,32GB,Unlocked,Physical SIM,700,,700
+iPhone Se2,64GB,Unlocked,Physical SIM,1300,,1300
+iPhone Xr,64GB,Unlocked,Physical SIM,1600,,1600
+iPhone Xr,128GB,Unlocked,Physical SIM,2000,,2000
+iPhone 11,64GB,Unlocked,Physical SIM,2000,,2000
+iPhone 11,128GB,Unlocked,Physical SIM,2400,,2400
+iPhone 11 Pro,64GB,Unlocked,Physical SIM,2600,,2600
+iPhone 11 Pro,256GB,Unlocked,Physical SIM,2800,,2800
+iPhone 12 Mini,64GB,Unlocked,Physical SIM,1950,,1950
+iPhone 12 Mini,128GB,Unlocked,Physical SIM,2150,,2150
+iPhone 12,64GB,Unlocked,Physical SIM,2400,,2400
+iPhone 12,128GB,Unlocked,Physical SIM,2800,,2800
+iPhone 12 Pro,128GB,Unlocked,Physical SIM,3200,,3200
+iPhone 12 Pro Max,128GB,Unlocked,Physical SIM,4050,,4050
+iPhone 13,128GB,Locked,Physical SIM,2200,,2200
+iPhone 13,128GB,Unlocked,Physical SIM,3300,,3300
+iPhone 13 Pro,128GB,Unlocked,Physical SIM,4400,,4400
+iPhone 13 Pro Max,128GB,Unlocked,Physical SIM,5100,,5100
+iPhone 14 Plus,128GB,Locked,eSIM,3400,,3400
+iPhone 14 Pro,128GB,Unlocked,Physical SIM,6200,,6200
+iPhone 14 Pro Max,128GB,Unlocked,Physical SIM,6400,,6400
+iPhone 14 Pro Max,256GB,Locked,eSIM,4300,,4300
+iPhone 15 Pro Max,256GB,Unlocked,eSIM,7900,,7900
+iPhone 16,128GB,Locked,eSIM,6100,,6100
+iPhone 16,128GB,Unlocked,eSIM,7500,,7500
+iPhone 16,128GB,Unlocked,Physical SIM,8325,,8325
+iPhone 16 Plus,128GB,Unlocked,Physical SIM,8300,,8300
+iPhone 16 Pro,128GB,Unlocked,eSIM,8600,,8600
+iPhone 16 Pro,256GB,Unlocked,eSIM,9100,,9100
+iPhone 16 Pro Max,256GB,Unlocked,eSIM,9700,,9700
+iPhone 16 Pro Max,256GB,Unlocked,Physical SIM,10500,,10500
+iPhone 16 Pro Max,1TB,Unlocked,eSIM,11200,,11200
+iPhone 17 Air,256GB,Unlocked,eSIM,10400,,10400
+iPhone 17 Air,256GB,Unlocked,Physical SIM,11800,,11800
+iPhone 17 Pro Max,256GB,Locked,Physical SIM,10900,,10900
+iPhone 17 Pro Max,256GB,Unlocked,Physical SIM,17250,,17250
