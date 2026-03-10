@@ -245,6 +245,30 @@ else:
                     default=["All"]
                 )
                 
+                # SIM Type Filter (Handling different possible column names)
+                sim_type_col = "SIM Type" if "SIM Type" in matched_df.columns else "Requested SIM Type"
+                if sim_type_col in matched_df.columns:
+                    all_sim_types = ["All"] + sorted(matched_df[sim_type_col].astype(str).unique().tolist())
+                    selected_sim_types = st.sidebar.multiselect(
+                        "Filter by SIM Type",
+                        options=all_sim_types,
+                        default=["All"]
+                    )
+                else:
+                    selected_sim_types = ["All"]
+
+                # SIM Status Filter
+                sim_status_col = "SIM Status" if "SIM Status" in matched_df.columns else "Requested SIM Status"
+                if sim_status_col in matched_df.columns:
+                    all_sim_statuses = ["All"] + sorted(matched_df[sim_status_col].astype(str).unique().tolist())
+                    selected_sim_statuses = st.sidebar.multiselect(
+                        "Filter by SIM Status",
+                        options=all_sim_statuses,
+                        default=["All"]
+                    )
+                else:
+                    selected_sim_statuses = ["All"]
+                
                 # ROI Slider
                 min_roi = float(matched_df["ROI_%"].min())
                 max_roi = float(matched_df["ROI_%"].max())
@@ -269,6 +293,12 @@ else:
                     
                 if "All" not in selected_storage and selected_storage:
                     filtered_df = filtered_df[filtered_df["Storage"].astype(str).isin(selected_storage)]
+                
+                if "All" not in selected_sim_types and selected_sim_types and sim_type_col in filtered_df.columns:
+                    filtered_df = filtered_df[filtered_df[sim_type_col].astype(str).isin(selected_sim_types)]
+                
+                if "All" not in selected_sim_statuses and selected_sim_statuses and sim_status_col in filtered_df.columns:
+                    filtered_df = filtered_df[filtered_df[sim_status_col].astype(str).isin(selected_sim_statuses)]
                     
                 filtered_df = filtered_df[filtered_df["ROI_%"] >= selected_min_roi]
                 
