@@ -312,13 +312,40 @@ else:
                 top10_profit = chart_df.head(10).set_index("Device_Label")[["Net_Profit_GHS"]]
                 top10_roi = chart_df.sort_values(by="ROI_%", ascending=False).head(10).set_index("Device_Label")[["ROI_%"]]
 
+                # Make sure plotly is available
+                try:
+                    import plotly.express as px
+                except ImportError:
+                    st.error("Please install plotly: pip install plotly")
+                    st.stop()
+                    
                 chart_col1, chart_col2 = st.columns(2)
                 with chart_col1:
                     st.write("**By Absolute Profit (GHS)**")
-                    st.bar_chart(top10_profit)
+                    fig_profit = px.bar(
+                        top10_profit.reset_index(), 
+                        x="Net_Profit_GHS", 
+                        y="Device_Label", 
+                        orientation='h',
+                        labels={"Net_Profit_GHS": "Net Profit (GHS)", "Device_Label": "Device"},
+                        color="Net_Profit_GHS",
+                    )
+                    fig_profit.update_layout(yaxis={'categoryorder':'total ascending'})
+                    st.plotly_chart(fig_profit, use_container_width=True)
+                    
                 with chart_col2:
                     st.write("**By ROI (%)**")
-                    st.bar_chart(top10_roi)
+                    fig_roi = px.bar(
+                        top10_roi.reset_index(), 
+                        x="ROI_%", 
+                        y="Device_Label", 
+                        orientation='h',
+                        labels={"ROI_%": "Return on Investment (%)", "Device_Label": "Device"},
+                        color="ROI_%",
+                        color_continuous_scale="Blues"
+                    )
+                    fig_roi.update_layout(yaxis={'categoryorder':'total ascending'})
+                    st.plotly_chart(fig_roi, use_container_width=True)
 
                 # Download matched results
                 csv_data = matched_df.drop(columns=["_merge"], errors="ignore").to_csv(index=False).encode("utf-8")
