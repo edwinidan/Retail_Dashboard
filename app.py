@@ -347,6 +347,57 @@ else:
                     fig_roi.update_layout(yaxis={'categoryorder':'total ascending'})
                     st.plotly_chart(fig_roi, use_container_width=True)
 
+                st.divider()
+
+                st.write("### Cost Breakdown of Top 10 Profitable Devices")
+                st.caption("Shows the breakdown of your total costs (Device + Shipping + Customs) compared to Local Market Price.")
+
+                # Calculate components of landed cost in GHS
+                top10_cost_df = chart_df.head(10).copy()
+                top10_cost_df["Device_Cost_GHS"] = top10_cost_df["US_Price_USD"] * exchange_rate
+                top10_cost_df["Shipping_Cost_GHS"] = shipping_cost
+                top10_cost_df["Customs_Fee_GHS"] = customs_fee
+
+                # Melt the dataframe for Plotly stacked bar chart
+                cost_breakdown_melted = top10_cost_df.melt(
+                    id_vars=["Device_Label", "Local_Price_GHS", "Net_Profit_GHS"],
+                    value_vars=["Device_Cost_GHS", "Shipping_Cost_GHS", "Customs_Fee_GHS"],
+                    var_name="Cost_Type",
+                    value_name="Amount_GHS"
+                )
+
+                # Clean up labels for display
+                cost_breakdown_melted["Cost_Type"] = cost_breakdown_melted["Cost_Type"].replace({
+                    "Device_Cost_GHS": "Device Cost",
+                    "Shipping_Cost_GHS": "Shipping",
+                    "Customs_Fee_GHS": "Customs"
+                })
+
+                fig_costs = px.bar(
+                    cost_breakdown_melted,
+                    x="Amount_GHS",
+                    y="Device_Label",
+                    color="Cost_Type",
+                    orientation="h",
+                    title="Total Landed Cost Breakdown",
+                    labels={"Amount_GHS": "Cost Amount (GHS)", "Device_Label": "Device", "Cost_Type": "Cost Component"},
+                    color_discrete_map={
+                        "Device Cost": "#1f77b4", # blue
+                        "Shipping": "#ff7f0e",    # orange
+                        "Customs": "#d62728"      # red
+                    }
+                )
+                
+                # Add hover data to show the final local price constraint
+                fig_costs.update_traces(
+                    hovertemplate="<b>%{y}</b><br>%{data.name}: GH\u20b5%{x:,.2f}<br>"
+                )
+                fig_costs.update_layout(yaxis={'categoryorder':'total ascending'})
+
+                st.plotly_chart(fig_costs, use_container_width=True)
+
+                st.divider()
+
                 # Download matched results
                 csv_data = matched_df.drop(columns=["_merge"], errors="ignore").to_csv(index=False).encode("utf-8")
                 st.download_button(
