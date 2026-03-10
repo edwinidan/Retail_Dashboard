@@ -33,6 +33,9 @@ customs_fee = st.sidebar.number_input(
 
 st.subheader("Upload Data Files")
 
+# Provide an option to load demo data
+load_demo = st.button("🚀 Load Sample Data (For Testing)")
+
 col1, col2 = st.columns(2)
 
 with col1:
@@ -52,7 +55,6 @@ with col2:
 required_supplier_cols = {"Model", "Storage", "Condition", "US_Price_USD"}
 required_local_cols = {"Model", "Storage", "Condition", "Local_Price_GHS"}
 
-
 def clean_dataframe(df):
     # Clean column names
     df.columns = df.columns.str.strip()
@@ -71,13 +73,29 @@ def clean_dataframe(df):
 
     return df
 
+# Determine which data to use
+supplier_df = None
+local_df = None
 
-if supplier_file is None or local_file is None:
-    st.info("Please upload both CSV files to continue.")
-else:
+if load_demo:
+    try:
+        supplier_df = pd.read_csv("supplier_sample.csv")
+        local_df = pd.read_csv("local_market_sample.csv")
+        st.success("Loaded sample data successfully!")
+    except FileNotFoundError:
+        st.error("Sample data files not found. Please upload your own CSVs.")
+elif supplier_file is not None and local_file is not None:
     try:
         supplier_df = pd.read_csv(supplier_file)
         local_df = pd.read_csv(local_file)
+        st.success("Uploaded CSV files successfully!")
+    except Exception as e:
+        st.error(f"Error reading uploaded files: {e}")
+else:
+    st.info("Please upload both CSV files or click 'Load Sample Data' to continue.")
+
+if supplier_df is not None and local_df is not None:
+    try:
 
         supplier_df = clean_dataframe(supplier_df)
         local_df = clean_dataframe(local_df)
