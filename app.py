@@ -511,6 +511,25 @@ else:
                 
                 st.plotly_chart(fig_donut, use_container_width=True)
 
+                st.write("#### 📋 Devices by ROI Tier")
+                
+                # We'll use Streamlit expanders to keep the page clean but allow the user to see the lists
+                for label in reversed(labels):  # Reverse the order to show most profitable first
+                    bucket_items = donut_df[donut_df['ROI_Bucket'] == label]
+                    
+                    if not bucket_items.empty:
+                        with st.expander(f"**{label}** ({len(bucket_items)} items)"):
+                            # Select only a few clean columns to display in this mini-table
+                            display_cols = ["Model", "Storage", "Net_Profit_GHS", "ROI_%"]
+                            
+                            st.dataframe(
+                                bucket_items[display_cols].style.format({
+                                    "Net_Profit_GHS": "GH\u20b5{:,.2f}",
+                                    "ROI_%": "{:,.2f}%"
+                                }).hide(axis="index"),
+                                use_container_width=True
+                            )
+                
                 st.divider()
 
                 # Download matched results
