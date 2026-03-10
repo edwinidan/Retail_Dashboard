@@ -398,6 +398,46 @@ else:
 
                 st.divider()
 
+                st.divider()
+
+                st.write("### ⚖️ Risk vs. Reward Analysis")
+                st.caption(
+                    "Find the 'Sweet Spot'. The best beginner opportunities are in the **Top-Left** "
+                    "(Low Upfront Capital, High Profit)."
+                )
+
+                # Create the Risk vs Reward Scatter Plot
+                fig_scatter = px.scatter(
+                    chart_df,
+                    x="Landed_Cost_GHS",
+                    y="Net_Profit_GHS",
+                    color="ROI_%",
+                    hover_name="Device_Label",
+                    labels={
+                        "Landed_Cost_GHS": "Total Upfront Capital Required (GHS)",
+                        "Net_Profit_GHS": "Potential Net Profit (GHS)",
+                        "ROI_%": "ROI (%)"
+                    },
+                    color_continuous_scale="Viridis",
+                    size_max=15
+                )
+
+                # Add a line indicating the break-even point (y=0)
+                fig_scatter.add_hline(y=0, line_dash="dash", line_color="red", annotation_text="Break Even")
+                
+                # Make the points a little bigger and slightly transparent for better readability
+                fig_scatter.update_traces(marker=dict(size=12, opacity=0.8, line=dict(width=1, color='DarkSlateGrey')))
+                
+                # Customize the axes
+                fig_scatter.update_layout(
+                    xaxis_title="<b>Risk</b> (Capital Required in GHS)",
+                    yaxis_title="<b>Reward</b> (Net Profit in GHS)",
+                )
+
+                st.plotly_chart(fig_scatter, use_container_width=True)
+
+                st.divider()
+
                 # Download matched results
                 csv_data = matched_df.drop(columns=["_merge"], errors="ignore").to_csv(index=False).encode("utf-8")
                 st.download_button(
